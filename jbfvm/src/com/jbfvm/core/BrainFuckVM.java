@@ -8,7 +8,7 @@ import java.util.Stack;
 
 public class BrainFuckVM implements Runnable {
 
-	private ArrayList<Byte> data = new ArrayList<>();
+	private ArrayList<Integer> data = new ArrayList<>();
 
 	private Stack<Long> pc_stack = new Stack<>();
 
@@ -36,11 +36,14 @@ public class BrainFuckVM implements Runnable {
 		if (data == null)
 			data = new byte[0];
 		for (byte i : data) {
-			this.data.add(i);
+			int t = ((i & 0x80) == 0) ? (i & 0xFF) : ((i & 0x7F) | 0x80);
+			if ((i & 0x80) != 0)
+				System.out.println("Test: " + t + "; " + i);
+			this.data.add(t);
 		}
 		program_len = data.length;
 		dc = program_len;
-		this.data.add((byte) 0x0);
+		this.data.add(0x0);
 		this.stdout = stdout;
 		this.stderr = stderr;
 		this.stdin = stdin;
@@ -67,31 +70,31 @@ public class BrainFuckVM implements Runnable {
 		if (dc < 0)
 			throw new IndexOutOfBoundsException("Data counter can't be smaller than 0");
 		while (dc >= data.size())
-			data.add((byte) 0x0);
+			data.add(0x0);
 	}
 
 	public long getDataCounter() {
 		return dc;
 	}
 
-	public byte getByte() throws IndexOutOfBoundsException {
+	public int getByte() throws IndexOutOfBoundsException {
 		if (dc < 0)
 			throw new IndexOutOfBoundsException("Data counter can't be smaller than 0");
 		return data.get((int) dc);
 	}
 
-	public void setByte(byte b) throws IndexOutOfBoundsException {
+	public void setByte(int b) throws IndexOutOfBoundsException {
 		if (dc < 0)
 			throw new IndexOutOfBoundsException("Data counter can't be smaller than 0");
-		data.set((int) dc, b);
+		data.set((int) dc, b & 0xFF);
 	}
 
-	public byte getInstruction() throws IndexOutOfBoundsException {
+	public int getInstruction() throws IndexOutOfBoundsException {
 		if (pc < 0)
-			throw new IndexOutOfBoundsException("Programm counter can't be smaller than 0");
+			throw new IndexOutOfBoundsException("Program counter can't be smaller than 0");
 		return data.get((int) pc);
 	}
-	
+
 	public long getProgramLength() {
 		return program_len;
 	}
@@ -107,10 +110,10 @@ public class BrainFuckVM implements Runnable {
 				setDataCounter(dc - 1L);
 				break;
 			case 0x2B: // +
-				setByte((byte) (getByte() + 1));
+				setByte(getByte() + 1);
 				break;
 			case 0x2D: // -
-				setByte((byte) (getByte() - 1));
+				setByte(getByte() - 1);
 				break;
 			case 0x5B: // [
 				pc_stack.push(pc - 1L);
@@ -127,7 +130,7 @@ public class BrainFuckVM implements Runnable {
 				break;
 			case 0x2C: // ,
 				if (stdin != null)
-					setByte((byte) stdin.read());
+					setByte(stdin.read());
 				break;
 			}
 			++pc;
