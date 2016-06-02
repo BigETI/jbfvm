@@ -153,7 +153,7 @@ public class BrainfuckVM implements Runnable {
 	private void incrementPointer() throws IndexOutOfBoundsException {
 		++p;
 		if (p < 0)
-			throw new IndexOutOfBoundsException("Data counter can't be smaller than 0");
+			throw new IndexOutOfBoundsException("Pointer can't be less than 0");
 		while (p >= data.size())
 			data.add((byte) 0x0);
 	}
@@ -166,7 +166,7 @@ public class BrainfuckVM implements Runnable {
 	private void decrementPointer() throws IndexOutOfBoundsException {
 		--p;
 		if (p < 0)
-			throw new IndexOutOfBoundsException("Data counter can't be smaller than 0");
+			throw new IndexOutOfBoundsException("Pointer can't be less than 0");
 		while (p >= data.size())
 			data.add((byte) 0x0);
 	}
