@@ -1,0 +1,11 @@
+apply plugin: 'java'
+apply plugin: 'eclipse'
+
+repositories {
+    jcenter()
+}
+
+dependencies {
+	testCompile("org.junit.jupiter:junit-jupiter-api:5.0.0-M4")
+	testRuntime("org.junit.jupiter:junit-jupiter-engine:5.0.0-M4")
+}
