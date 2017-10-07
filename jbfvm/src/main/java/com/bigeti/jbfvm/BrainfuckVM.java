@@ -1,4 +1,4 @@
-package com.jbfvm.core;
+package com.bigeti.jbfvm;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -8,21 +8,21 @@ import java.util.Stack;
 
 /**
  * Brainfuck VM class
- * 
- * @author Ethem Kurt
  *
+ * @author Ethem Kurt
  */
-public class BrainfuckVM implements Runnable {
+public class BrainfuckVM implements Runnable
+{
 
 	/**
 	 * Program and data
 	 */
-	private ArrayList<Byte> data = new ArrayList<>();
+	private final ArrayList<Byte> data = new ArrayList<>();
 
 	/**
 	 * Program counter stack
 	 */
-	private Stack<Integer> pc_stack = new Stack<>();
+	private final Stack<Integer> pc_stack = new Stack<>();
 
 	/**
 	 * Standard output
@@ -56,17 +56,18 @@ public class BrainfuckVM implements Runnable {
 
 	/**
 	 * Constructor
-	 * 
+	 *
 	 * @param program
 	 *            Program
 	 */
-	public BrainfuckVM(byte[] program) {
+	public BrainfuckVM(final byte[] program)
+	{
 		init(program, null, null, null);
 	}
 
 	/**
 	 * Constructor
-	 * 
+	 *
 	 * @param program
 	 *            Program
 	 * @param stdout
@@ -76,236 +77,291 @@ public class BrainfuckVM implements Runnable {
 	 * @param stdin
 	 *            Standard input
 	 */
-	public BrainfuckVM(byte[] program, PrintStream stdout, PrintStream stderr, InputStream stdin) {
+	public BrainfuckVM(final byte[] program, final PrintStream stdout, final PrintStream stderr, final InputStream stdin)
+	{
 		init(program, stdout, stderr, stdin);
 	}
 
 	/**
 	 * Initialize VM
-	 * 
+	 *
 	 * @param program
 	 *            Program
-	 * @param stdout
+	 * @param stdOut
 	 *            Standard output
-	 * @param stderr
+	 * @param stdErr
 	 *            Standard error output
-	 * @param stdin
+	 * @param stdIn
 	 *            Standard input
 	 */
-	private void init(byte[] program, PrintStream stdout, PrintStream stderr, InputStream stdin) {
+	private void init(byte[] program, final PrintStream stdOut, final PrintStream stdErr, final InputStream stdIn)
+	{
 		if (program == null)
+		{
 			program = new byte[0];
-		for (byte i : program) {
+		}
+		for (final byte i : program)
+		{
 			data.add(i);
 		}
 		program_len = program.length;
 		p = program_len;
 		data.add((byte) 0x0);
-		if (stdout != null)
-			this.stdout = stdout;
-		if (stderr != null)
-			this.stderr = stderr;
-		if (stdin != null)
-			this.stdin = stdin;
+		if (stdOut != null)
+		{
+			this.stdout = stdOut;
+		}
+		if (stdErr != null)
+		{
+			this.stderr = stdErr;
+		}
+		if (stdIn != null)
+		{
+			this.stdin = stdIn;
+		}
 	}
 
 	/**
 	 * Get standard output
-	 * 
+	 *
 	 * @return Standard output
 	 */
-	public PrintStream getStdOut() {
+	public PrintStream getStdOut()
+	{
 		return stdout;
 	}
 
 	/**
 	 * Get standard error output
-	 * 
+	 *
 	 * @return Standard error output
 	 */
-	public PrintStream getStdErr() {
+	public PrintStream getStdErr()
+	{
 		return stderr;
 	}
 
 	/**
 	 * Get standard input
-	 * 
+	 *
 	 * @return Standard input
 	 */
-	public InputStream getStdIn() {
+	public InputStream getStdIn()
+	{
 		return stdin;
 	}
 
 	/**
 	 * Get program counter
-	 * 
+	 *
 	 * @return Program counter
 	 */
-	public long getProgramCounter() {
+	public long getProgramCounter()
+	{
 		return pc;
 	}
 
 	/**
 	 * Increment pointer
-	 * 
+	 *
 	 * @throws IndexOutOfBoundsException
 	 */
-	private void incrementPointer() throws IndexOutOfBoundsException {
+	private void incrementPointer() throws IndexOutOfBoundsException
+	{
 		++p;
 		if (p < 0)
+		{
 			throw new IndexOutOfBoundsException("Pointer can't be less than 0");
+		}
 		while (p >= data.size())
+		{
 			data.add((byte) 0x0);
+		}
 	}
 
 	/**
 	 * Decrement pointer
-	 * 
+	 *
 	 * @throws IndexOutOfBoundsException
 	 */
-	private void decrementPointer() throws IndexOutOfBoundsException {
+	private void decrementPointer() throws IndexOutOfBoundsException
+	{
 		--p;
 		if (p < 0)
+		{
 			throw new IndexOutOfBoundsException("Pointer can't be less than 0");
+		}
 		while (p >= data.size())
+		{
 			data.add((byte) 0x0);
+		}
 	}
 
 	/**
 	 * Get pointer
-	 * 
+	 *
 	 * @return Pointer
 	 */
-	public int getPointer() {
+	public int getPointer()
+	{
 		return p;
 	}
 
 	/**
 	 * Get byte
-	 * 
+	 *
 	 * @return Byte
 	 * @throws IndexOutOfBoundsException
 	 *             Invalid pointer access
 	 */
-	public byte getByte() throws IndexOutOfBoundsException {
+	public byte getByte() throws IndexOutOfBoundsException
+	{
 		if (p < 0)
+		{
 			throw new IndexOutOfBoundsException("Pointer can't be less than 0");
+		}
 		return data.get(p);
 	}
 
 	/**
 	 * Set byte
-	 * 
+	 *
 	 * @param b
 	 *            Byte
 	 * @throws IndexOutOfBoundsException
 	 *             Invalid pointer access
 	 */
-	private void setByte(byte b) throws IndexOutOfBoundsException {
+	private void setByte(final byte b) throws IndexOutOfBoundsException
+	{
 		if (p < 0)
+		{
 			throw new IndexOutOfBoundsException("Pointer can't be less than 0");
+		}
 		data.set(p, b);
 	}
 
 	/**
 	 * Increment byte
-	 * 
+	 *
 	 * @throws IndexOutOfBoundsException
 	 *             Invalid pointer access
 	 */
-	private void incrementByte() throws IndexOutOfBoundsException {
+	private void incrementByte() throws IndexOutOfBoundsException
+	{
 		setByte((byte) ((getByte() & 0xFF) + 1));
 	}
 
 	/**
 	 * Decrement byte
-	 * 
+	 *
 	 * @throws IndexOutOfBoundsException
 	 *             Invalid pointer access
 	 */
-	private void decrementByte() throws IndexOutOfBoundsException {
+	private void decrementByte() throws IndexOutOfBoundsException
+	{
 		setByte((byte) ((getByte() & 0xFF) - 1));
 	}
 
 	/**
 	 * Get instruction
-	 * 
+	 *
 	 * @return Instruction
 	 * @throws IndexOutOfBoundsException
 	 *             Invalid program counter access
 	 */
-	public byte getInstruction() throws IndexOutOfBoundsException {
+	public byte getInstruction() throws IndexOutOfBoundsException
+	{
 		if (pc < 0)
+		{
 			throw new IndexOutOfBoundsException("Program counter can't be smaller than 0");
+		}
 		return data.get(pc);
 	}
 
 	/**
 	 * Get program length
-	 * 
+	 *
 	 * @return Program length
 	 */
-	public int getProgramLength() {
+	public int getProgramLength()
+	{
 		return program_len;
 	}
 
 	/**
 	 * Instruction step
-	 * 
+	 *
 	 * @return "true" if not terminated, otherwise "false"
 	 * @throws IndexOutOfBoundsException
 	 *             Invalid pointer or program counter access
 	 * @throws IOException
 	 *             Program error
 	 */
-	public boolean step() throws IndexOutOfBoundsException, IOException {
+	public boolean step() throws IndexOutOfBoundsException, IOException
+	{
 		boolean ret = false;
-		if (pc < program_len) {
-			switch (getInstruction()) {
-			case 0x3E: // >
-				incrementPointer();
-				break;
-			case 0x3C: // <
-				decrementPointer();
-				break;
-			case 0x2B: // +
-				incrementByte();
-				break;
-			case 0x2D: // -
-				decrementByte();
-				break;
-			case 0x5B: // [
-				if (getByte() == 0) {
-					int brackets = 0;
-					while (pc < program_len) {
-						switch (getInstruction()) {
-						case 0x5B: // [
-							++brackets;
-							break;
-						case 0x5D: // ]
-							--brackets;
-							break;
+		if (pc < program_len)
+		{
+			switch (getInstruction())
+			{
+				case 0x3E: // >
+					incrementPointer();
+					break;
+				case 0x3C: // <
+					decrementPointer();
+					break;
+				case 0x2B: // +
+					incrementByte();
+					break;
+				case 0x2D: // -
+					decrementByte();
+					break;
+				case 0x5B: // [
+					if (getByte() == 0)
+					{
+						int brackets = 0;
+						while (pc < program_len)
+						{
+							switch (getInstruction())
+							{
+								case 0x5B: // [
+									++brackets;
+									break;
+								case 0x5D: // ]
+									--brackets;
+									break;
+							}
+							if (brackets == 0)
+							{
+								break;
+							}
+							++pc;
 						}
-						if (brackets == 0)
-							break;
-						++pc;
+						if (brackets > 0)
+						{
+							throw new IOException("Invalid brackets detected");
+						}
 					}
-					if (brackets > 0)
-						throw new IOException("Invalid brackets detected");
-				} else
-					pc_stack.push(pc - 1);
-				break;
-			case 0x5D: // ]
-				pc = pc_stack.pop().intValue();
-				break;
-			case 0x2E: // .
-				if (stdout != null)
-					stdout.print((char) getByte());
-				break;
-			case 0x2C: // ,
-				if (stdin != null)
-					setByte((byte) stdin.read());
-				break;
+					else
+					{
+						pc_stack.push(pc - 1);
+					}
+					break;
+				case 0x5D: // ]
+					pc = pc_stack.pop().intValue();
+					break;
+				case 0x2E: // .
+					if (stdout != null)
+					{
+						stdout.print((char) getByte());
+					}
+					break;
+				case 0x2C: // ,
+					if (stdin != null)
+					{
+						setByte((byte) stdin.read());
+					}
+					break;
 			}
 			++pc;
 			ret = true;
@@ -313,19 +369,22 @@ public class BrainfuckVM implements Runnable {
 		return ret;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.lang.Runnable#run()
-	 */
 	@Override
-	public void run() {
-		try {
+	public void run()
+	{
+		try
+		{
 			while (step())
-				;
-		} catch (IndexOutOfBoundsException | IOException e) {
+			{
+				// Do nothing
+			}
+		}
+		catch (IndexOutOfBoundsException | IOException e)
+		{
 			if (stderr != null)
+			{
 				e.printStackTrace(stderr);
+			}
 		}
 	}
 }
