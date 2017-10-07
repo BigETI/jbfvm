@@ -39,7 +39,7 @@ public class BrainfuckVMTest
 			}
 		}
 		bfvm = new BrainfuckVM(baos.toByteArray());
-y	}
+	}
 
 	/**
 	 * Test
