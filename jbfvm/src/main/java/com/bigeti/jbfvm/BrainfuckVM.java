@@ -96,15 +96,12 @@ public class BrainfuckVM implements Runnable
 	 */
 	private void init(byte[] program, final PrintStream stdOut, final PrintStream stdErr, final InputStream stdIn)
 	{
-		if (program == null)
-		{
-			program = new byte[0];
-		}
-		for (final byte i : program)
+		byte[] prog = (program == null) ? new byte[0] : program;
+		for (final byte i : prog)
 		{
 			data.add(i);
 		}
-		program_len = program.length;
+		program_len = prog.length;
 		p = program_len;
 		data.add((byte) 0x0);
 		if (stdOut != null)
